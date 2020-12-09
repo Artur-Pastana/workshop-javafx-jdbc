@@ -3,6 +3,7 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import application.Main;
 import gui.util.Alerts;
@@ -35,20 +36,23 @@ public class MainViewController implements Initializable {
 	
 	@FXML
 	private void onMenuItemDepartamentoAction() {
-		loadView2("/gui/DepartmentList.fxml");
+		loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
+			controller.setDepartmentService(new DepartmentService());
+			controller.updateTableView();
+		});
 	}
 	
 	@FXML
 	private void onMenuItemAboutAction() { 
 		//System.out.println("onMenuItemAboutAction");
-		loadView("/gui/About.fxml");
+		loadView("/gui/About.fxml", x -> {});
 	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 	}
 	
-	private synchronized void loadView(String absoluteName) {
+	private synchronized <T> void loadView(String absoluteName , Consumer<T> initializeAction) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			
@@ -62,14 +66,15 @@ public class MainViewController implements Initializable {
 			mainVBox.getChildren().add(mainMenu);
 			mainVBox.getChildren().addAll(newVBox);
 			
-			
+			T controller = loader.getController();
+			initializeAction.accept(controller);
 			
 		}catch (IOException e) {
 			Alerts.showAlert("Io exception", "erro carregando a pagina", e.getMessage(), AlertType.ERROR);
 		}
 	}
 	
-	private synchronized void loadView2(String absoluteName) {
+	/*private synchronized void loadView2(String absoluteName) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			
@@ -92,7 +97,7 @@ public class MainViewController implements Initializable {
 			Alerts.showAlert("Io exception", "erro carregando a pagina", e.getMessage(), AlertType.ERROR);
 		}
 	}
-/*FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			VBox newVbox = loader.load();
 			
 			Scene mainScene = Main.getMainScene();
