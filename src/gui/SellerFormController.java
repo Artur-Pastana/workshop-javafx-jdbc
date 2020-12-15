@@ -1,9 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -125,22 +127,43 @@ public class SellerFormController implements Initializable {
 	}
 
 	private Seller getFormData() {
-		Seller dep = new Seller();
+		Seller obj = new Seller();
 
 		ValidationException exception = new ValidationException("Validação de erro");
 
-		dep.setId(Utils.tryParseToInt(txtId.getText()));
+		obj.setId(Utils.tryParseToInt(txtId.getText()));
 
 		if (txtName.getText() == null || txtName.getText().trim().equals("")) {
 			exception.addErros("nome", "Campo não pode está vazio");
 		}
-		dep.setName(txtName.getText());
+		obj.setName(txtName.getText());
+		
+		if (txtEmail.getText() == null || txtEmail.getText().trim().equals("")) {
+			exception.addErros("email", "Campo não pode está vazio");
+		}
+		obj.setEmail(txtEmail.getText());
+		
+		if (dpBirthDate.getValue() == null) {
+			exception.addErros("birthDate", "Campo não pode está vazio");
+		}
+		else {
+			Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+			obj.setBirthDate(Date.from(instant));
+		}
+		
+		
+		if (txtBaseSalary.getText() == null || txtBaseSalary.getText().trim().equals("")) {
+			exception.addErros("baseSalary", "Campo não pode está vazio");
+		}
+		obj.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));
+		
+		obj.setDepartment(comboBoxDepartment.getValue());
 
 		if (exception.getErros().size() > 0) {
 			throw exception;
 		}
 
-		return dep;
+		return obj;
 	}
 
 	@FXML
@@ -200,11 +223,36 @@ public class SellerFormController implements Initializable {
 	private void setErroMenssagens(Map<String, String> erros) {
 		Set<String> campos = erros.keySet();
 
-		if (campos.contains("nome")) {
+		labelErrorName.setText(campos.contains("nome") ? erros.get("nome") : "");
+		
+		labelErrorEmail.setText(campos.contains("email") ? erros.get("email") : "");
+		
+		labelErrorBaseSalary.setText(campos.contains("baseSalary") ? erros.get("baseSalary") : "");
+		
+		labelErrorBirthDate.setText(campos.contains("birthDate") ? erros.get("birthDate") : "");
+		
+		/*if (campos.contains("nome")) {
 			this.labelErrorName.setText(erros.get("nome"));
-			JOptionPane.showMessageDialog(null, "Digite Novamente um Nome valido");
+			//JOptionPane.showMessageDialog(null, "Digite Novamente um Nome valido");
+		}
+		else {
+			labelErrorName.setText("");
+		}
+		
+		if (campos.contains("email")) {
+			this.labelErrorEmail.setText(erros.get("email"));
+			//JOptionPane.showMessageDialog(null, "Digite Novamente um Email valido");
+		}
+		
+		if (campos.contains("baseSalary")) {
+			this.labelErrorBaseSalary.setText(erros.get("baseSalary"));
+			//JOptionPane.showMessageDialog(null, "Digite Novamente um Salario valido");
 		}
 
+		if (campos.contains("birthDate")) {
+			this.labelErrorBirthDate.setText(erros.get("birthDate"));
+			//JOptionPane.showMessageDialog(null, "Digite Novamente uma Data valida");
+		}*/
 	}
 
 	private void initializeComboBoxDepartment() {

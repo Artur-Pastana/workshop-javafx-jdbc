@@ -67,7 +67,7 @@ public class Utils {
 	}
 
 	public static void formatDatePicker(DatePicker datePicker, String format) {
-		//método para formartar a data como nós queremos
+		// método para formartar a data como nós queremos
 		datePicker.setConverter(new StringConverter<LocalDate>() {
 			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(format);
 			{
@@ -92,6 +92,15 @@ public class Utils {
 				}
 			}
 		});
+	}
+
+	public static Double tryParseToDouble(String str) {// Método que irar converter os valores
+		// da caixinha de texto em valor Double
+		try {
+			return Double.parseDouble(str);
+		} catch (NumberFormatException e) {
+			return null;
+		}
 	}
 
 }
